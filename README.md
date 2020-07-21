@@ -1,4 +1,4 @@
-#Stock Ticker
+# Stock Ticker
 
 ### Install
 `pip install -r requirements.txt`
