@@ -3,3 +3,14 @@ yfinance
 lxml
 
 requests
+
+django
+
+jsonfield
+
+pytest
+pytest-django
+
+mysqlclient
+
+bdateutil

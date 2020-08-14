@@ -1,3 +1,5 @@
+from stocks.datalayer import LiveStock
+
 TOP_100_STOCKS_SYMBOLS = [
     "ATVI", "ADBE", "AMD", "ALXN", "ALGN", "GOOG", "GOOGL", "AMZN", "AMGN", "ADI", "ANSS", "AAPL",
     "AMAT", "ASML", "ADSK", "ADP", "BIDU", "BIIB", "BMRN", "BKNG", "AVGO", "CDNS", "CDW", "CERN",
@@ -9,3 +11,5 @@ TOP_100_STOCKS_SYMBOLS = [
     "SIRI", "SWKS", "SPLK", "SBUX", "SNPS", "TMUS", "TTWO", "TSLA", "TXN", "KHC", "TCOM", "ULTA",
     "VRSN", "VRSK", "VRTX", "WBA", "WDC", "WDAY", "XEL", "XLNX", "ZM"
 ]
+
+TOP_100_STOCKS = [LiveStock.from_stock_name(x) for x in TOP_100_STOCKS_SYMBOLS]
