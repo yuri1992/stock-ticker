@@ -9,8 +9,8 @@ from django.utils.timezone import now
 from stocks import utils
 from stocks.algorithm import AlgorithmBase
 from stocks.background import BackgroundRunner
-from stocks.constants import TOP_100_STOCKS
-from stocks.utils import get_change
+from stocks.constants import TOP_500_STOCKS
+from stocks.utils import get_change, run_async
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +36,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
         self.run_on_business_days = run_on_business_days
 
         self.last_time = None
+        self.last_time_find_criteria = None
         self.init()
 
     def init(self):
@@ -64,21 +65,36 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
                 self.sell_stock(stock.live)
 
     def find_stocks_in_criteria(self, already_purchased_stocks):
+        if self.last_time_find_criteria and now() - self.last_time_find_criteria < timedelta(minutes=self.interval):
+            return
         # loop over all the symbols we want
-        for stock in TOP_100_STOCKS:
+        for stock in TOP_500_STOCKS:
             if stock in already_purchased_stocks or stock in self.stock_to_watch:
-                pass
+                continue
+            self.check_stock_in_criteria(stock)
 
+        self.last_time_find_criteria = now()
+
+    @run_async
+    def check_stock_in_criteria(self, stock):
+        try:
             hist = stock.data.history(period="1mo", auto_adjust=False)
             price_change = hist.Close[-1] - hist.Close[0]
             percentage_change = utils.get_change(hist.Close[0], hist.Close[-1])
             if price_change < 0 and percentage_change > self.percentage_decrease:
-                logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s", stock.name,
-                            hist.Close[0], hist.Close[-1])
+                logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s, Price at CoronaPeak %s",
+                            stock.name,
+                            hist.Close[0], hist.Close[-1],
+                            stock.data.history(start="2020-03-23", end="2020-03-24", auto_adjust=False).Close[0])
                 self.stock_to_watch.add(stock)
+        except:
+            logger.warn("Error getting data about %s", stock.name)
 
     def watch_stocks(self):
-        if self.last_time and now() - self.last_time < timedelta(minutes=self.interval):
+        if not self.stock_to_watch:
+            return
+
+        if self.last_time and now() - self.last_time < timedelta(minutes=3):
             return
 
         self.last_time = now()
@@ -94,10 +110,10 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
 
             # Check when to buy the stock.
             # Get price form yahoo
-            current_price = stock.price
-            logger.info("Stock %s price now is %s", stock.name, current_price)
-
             last_price = self.stock_watcher[stock.name].get("last_price")
+            current_price = stock.price
+            logger.info("Stock %s price now is %s, last price was %s", stock.name, current_price, last_price)
+
             if last_price:
                 if current_price > last_price:
                     self.stock_watcher[stock.name].get('history').append(True)

@@ -9,7 +9,6 @@ log = logging.getLogger(__name__)
 
 
 class Runner:
-
     def __init__(self):
         self.running_strategies = {}
         self.exit_event = Event()

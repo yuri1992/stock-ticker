@@ -27,7 +27,7 @@ class LiveStock:
 
     @property
     def price(self):
-        return self.data.history(period="1d").Close[0]
+        return self.data.history(period="1d", auto_adjust=False).Close[0]
 
     @classmethod
     def from_stock_name(cls, stock_name):
@@ -36,7 +36,7 @@ class LiveStock:
         return stock
 
     def get_close_price(self, period="1d"):
-        return self.data.history(period=period).Close[0]
+        return self.data.history(period=period, auto_adjust=False).Close[0]
 
     def get_open_price(self, period="1d"):
-        return self.data.history(period=period).Open[0]
+        return self.data.history(period=period, auto_adjust=False).Open[0]
