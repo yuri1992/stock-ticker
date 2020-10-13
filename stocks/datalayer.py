@@ -27,7 +27,10 @@ class LiveStock:
 
     @property
     def price(self):
-        return self.data.history(period="1d", auto_adjust=False).Close[0]
+        try:
+            return self.data.history(period="1d", auto_adjust=False).Close[0]
+        except:
+            return 0
 
     @classmethod
     def from_stock_name(cls, stock_name):

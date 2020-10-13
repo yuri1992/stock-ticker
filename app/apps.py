@@ -1,6 +1,7 @@
 import os
 
 from django.apps import AppConfig
+from django.utils.timezone import now
 
 
 class AppConfig(AppConfig):
@@ -11,7 +12,9 @@ class AppConfig(AppConfig):
             # importing model classes
             from .runner import Runner  # or...
             from .models import Strategy  # or...
-            s = Strategy.objects.get_or_create(name="strategy1", python_model='app.strategies.amit_strategy')
+            s, _ = Strategy.objects.get_or_create(name="strategy1", python_model='app.strategies.amit_strategy')
+            s.start_at = now()
+            s.save()
             if os.environ.get('RUN_MAIN', None):
                 Runner.runner(force=False)
         except:

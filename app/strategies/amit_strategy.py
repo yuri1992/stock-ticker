@@ -48,6 +48,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
             time.sleep(60 * 30)
             return None
 
+        logger.info("started")
         already_purchased_stocks = set()
         self.watch_stock_to_sell(already_purchased_stocks)
         self.watch_stocks()
