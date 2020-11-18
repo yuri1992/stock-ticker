@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class MyStrategy(AlgorithmBase, BackgroundRunner):
-    def __init__(self, sell_threshold=2, interval=15, percentage_decrease=3, number_of_increase_in_row=4,
+    def __init__(self, sell_threshold=2, interval=15, percentage_decrease=11, number_of_increase_in_row=4,
                  run_on_business_days=True,
                  *args,
                  **kwargs):
@@ -79,14 +79,16 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
     @run_async
     def check_stock_in_criteria(self, stock):
         try:
-            hist = stock.data.history(period="1mo", auto_adjust=False)
-            price_change = hist.Close[-1] - hist.Close[0]
-            percentage_change = utils.get_change(hist.Close[0], hist.Close[-1])
-            if price_change < 0 and percentage_change > self.percentage_decrease:
-                logger.info("Stock %s entered to the watch list, Price at corona peak ago %s, Price now %s",
+            price_now = stock.data.history(period="1d", auto_adjust=False).Close[0]
+            corona_price = stock.data.history(start="2020-03-23", end="2020-03-24", auto_adjust=False).Close[0]
+            price_before_corona = stock.data.history(start="2020-01-23", end="2020-01-24", auto_adjust=False).Close[0]
+
+            if price_now < price_before_corona and utils.get_change(price_now, price_before_corona) > 20 and corona_price > price_now:
+                logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s, Price at CoronaPeak %s",
                             stock.name,
-                            hist.Close[0],
-                            hist.Close[-1])
+                            price_before_corona,
+                            price_now,
+                            corona_price)
 
                 self.stock_to_watch.add(stock)
         except:

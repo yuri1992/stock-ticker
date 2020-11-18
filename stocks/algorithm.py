@@ -10,6 +10,7 @@ class AlgorithmBase:
         super(AlgorithmBase, self).__init__()
         self.algo = Strategy.objects.get(name=strategy_name or self.__class__.__name__)
 
+
     def get_portfolio(self):
         try:
             return self.algo.portfolio
