@@ -9,7 +9,7 @@ class AlgorithmBase:
     def __init__(self, strategy_name=None, *args, **kwargs):
         super(AlgorithmBase, self).__init__()
         self.algo = Strategy.objects.get(name=strategy_name or self.__class__.__name__)
-
+        self.iteration = 0
 
     def get_portfolio(self):
         try:

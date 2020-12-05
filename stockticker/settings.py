@@ -132,10 +132,26 @@ LOGGING = {
             "level": "DEBUG",
             'class': 'logging.StreamHandler',
             "formatter": "main_formatter",
-        }
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './debug.log',
+            "formatter": "main_formatter",
+        },
     },
     'root': {
         'handlers': ['console'],
         'level': 'INFO',
     },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+        },
+        'app.strategies.corona_watcher': {
+            'handlers': ['file'],
+            'level': 'INFO',
+        }
+    }
 }

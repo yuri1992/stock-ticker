@@ -43,12 +43,13 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
         pass
 
     def run(self):
-        if self.run_on_business_days and not isbday(now()):
-            logger.info("%s is not a business day, we are going to sleep", now())
-            time.sleep(60 * 30)
-            return None
+        super(MyStrategy, self).run()
 
-        logger.info("started")
+        # if self.run_on_business_days and not isbday(now()):
+        #     logger.info("%s is not a business day, we are going to sleep", now())
+        #     time.sleep(60 * 30)
+        #     return None
+
         already_purchased_stocks = set()
         self.watch_stock_to_sell(already_purchased_stocks)
         self.watch_stocks()
@@ -83,7 +84,8 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
             corona_price = stock.data.history(start="2020-03-23", end="2020-03-24", auto_adjust=False).Close[0]
             price_before_corona = stock.data.history(start="2020-01-23", end="2020-01-24", auto_adjust=False).Close[0]
 
-            if price_now < price_before_corona and utils.get_change(price_now, price_before_corona) > 20 and corona_price > price_now:
+            if price_now < price_before_corona and utils.get_change(price_now,
+                                                                    price_before_corona) > 50:
                 logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s, Price at CoronaPeak %s",
                             stock.name,
                             price_before_corona,
@@ -103,7 +105,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
 
         self.last_time = now()
         for stock in list(self.stock_to_watch):
-            if stock.name not in self.stock_to_watch:
+            if stock.name not in self.stock_watcher:
                 self.stock_watcher[stock.name] = {
                     'history': deque(maxlen=self.number_of_increase_in_row),  # Number of increase we need
                     'history_prices': deque(maxlen=self.number_of_increase_in_row),  # Number of increase we need

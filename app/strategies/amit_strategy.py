@@ -33,6 +33,8 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
         self.stock_to_watch = set()
         self.stock_watcher = {}
 
+        self.iteration = 0
+
         self.run_on_business_days = run_on_business_days
 
         self.last_time = None
@@ -43,12 +45,12 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
         pass
 
     def run(self):
+        super(MyStrategy, self).run()
         if self.run_on_business_days and not isbday(now()):
             logger.info("%s is not a business day, we are going to sleep", now())
             time.sleep(60 * 30)
             return None
 
-        logger.info("started")
         already_purchased_stocks = set()
         self.watch_stock_to_sell(already_purchased_stocks)
         self.watch_stocks()
@@ -82,6 +84,10 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
             hist = stock.data.history(period="1mo", auto_adjust=False)
             price_change = hist.Close[-1] - hist.Close[0]
             percentage_change = utils.get_change(hist.Close[0], hist.Close[-1])
+            """
+                Checking if the stock has a decrese momentom in the last month.
+                checking if the stock has decrease more than %self.percentage_decrease
+            """
             if price_change < 0 and percentage_change > self.percentage_decrease:
                 logger.info("Stock %s entered to the watch list, Price at corona peak ago %s, Price now %s",
                             stock.name,
@@ -101,7 +107,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
 
         self.last_time = now()
         for stock in list(self.stock_to_watch):
-            if stock.name not in self.stock_to_watch:
+            if stock.name not in self.stock_watcher:
                 self.stock_watcher[stock.name] = {
                     'history': deque(maxlen=self.number_of_increase_in_row),  # Number of increase we need
                     'history_prices': deque(maxlen=self.number_of_increase_in_row),  # Number of increase we need

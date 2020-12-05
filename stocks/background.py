@@ -1,5 +1,10 @@
+import logging
 import time
 from threading import Event, Thread
+
+from django.utils.timezone import now
+
+logger = logging.getLogger(__name__)
 
 
 class BackgroundRunner:
@@ -8,6 +13,7 @@ class BackgroundRunner:
         self.exit_event = exit_event or Event()
         self.thread = None
         self.sleep_time = 60
+        self.iteration = 0
 
     def start(self):
         self.thread = Thread(target=self._run)
@@ -15,7 +21,8 @@ class BackgroundRunner:
         return self.thread
 
     def run(self):
-        raise NotImplemented
+        logger.info("%s Iteration %s started at %s ", self.__class__.__name__, self.iteration, now())
+        self.iteration += 1
 
     def _run(self):
         while not self.exit_event.is_set():
