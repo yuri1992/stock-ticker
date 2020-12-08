@@ -1,1 +1,1 @@
-web: gunicorn stockticker.wsgi
+web: gunicorn stockticker.wsgi --log-level=info
