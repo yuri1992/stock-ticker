@@ -7,13 +7,15 @@ from django.utils.timezone import now
 from stocks import utils
 from stocks.algorithm import AlgorithmBase
 from stocks.background import BackgroundRunner
-from stocks.constants import TOP_500_STOCKS
+from stocks.constants import TOP_500_STOCKS, TOP_1000_STOCKS
 from stocks.utils import get_change, run_async
 
 logger = logging.getLogger(__name__)
 
 
 class MyStrategy(AlgorithmBase, BackgroundRunner):
+    STOCK_LIST = TOP_1000_STOCKS
+
     def __init__(self, sell_threshold=2, interval=15, percentage_decrease=11, number_of_increase_in_row=4,
                  run_on_business_days=True,
                  *args,
@@ -68,7 +70,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
         if self.last_time_find_criteria and now() - self.last_time_find_criteria < timedelta(minutes=self.interval):
             return
         # loop over all the symbols we want
-        for stock in TOP_500_STOCKS:
+        for stock in self.STOCK_LIST:
             if stock in already_purchased_stocks or stock in self.stock_to_watch:
                 continue
             self.check_stock_in_criteria(stock)
@@ -83,7 +85,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
             price_before_corona = stock.data.history(start="2020-01-23", end="2020-01-24", auto_adjust=False).Close[0]
 
             if price_now < price_before_corona and \
-                    utils.get_change(price_now, price_before_corona) > 50 and \
+                    utils.get_change(price_now, price_before_corona) > 30 and \
                     corona_price > price_now:
                 logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s, Price at CoronaPeak %s",
                             stock.name,

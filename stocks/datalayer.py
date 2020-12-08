@@ -1,4 +1,8 @@
+import logging
+
 import yfinance as yf
+
+logger = logging.getLogger(__name__)
 
 
 class YahooFinanceMixin:
@@ -36,6 +40,11 @@ class LiveStock:
     def from_stock_name(cls, stock_name):
         stock = LiveStock(stock_name)
         stock.data = yf.Ticker(stock_name)
+        # try:
+        #     if stock.get_close_price():
+        #         return stock
+        # except:
+        #     logger.error("Error fetching data on stock")
         return stock
 
     def get_close_price(self, period="1d"):

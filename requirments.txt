@@ -14,3 +14,7 @@ pytest-django
 mysqlclient
 
 bdateutil
+
+gunicorn
+
+django-heroku
