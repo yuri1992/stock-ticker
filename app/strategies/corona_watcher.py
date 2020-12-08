@@ -1,9 +1,7 @@
 import logging
-import time
 from collections import deque
 from datetime import timedelta
 
-from bdateutil import isbday
 from django.utils.timezone import now
 
 from stocks import utils
@@ -84,8 +82,9 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
             corona_price = stock.data.history(start="2020-03-23", end="2020-03-24", auto_adjust=False).Close[0]
             price_before_corona = stock.data.history(start="2020-01-23", end="2020-01-24", auto_adjust=False).Close[0]
 
-            if price_now < price_before_corona and utils.get_change(price_now,
-                                                                    price_before_corona) > 50:
+            if price_now < price_before_corona and \
+                    utils.get_change(price_now, price_before_corona) > 50 and \
+                    corona_price > price_now:
                 logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s, Price at CoronaPeak %s",
                             stock.name,
                             price_before_corona,

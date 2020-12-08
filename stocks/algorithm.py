@@ -34,13 +34,10 @@ class AlgorithmBase:
         )
 
     def sell_stock(self, stock: LiveStock, quantity=None):
-        stock = self.get_portfolio().stock_set.get(stock_ticker=stock.name, sold_at__isnull=True)
-        if quantity is None:
-            quantity = stock.quantity
-
-        stock.current_price = stock.price
-        stock.sold_price = stock.price
-        stock.sold_at = now()
-        stock.save()
+        for stock_db in self.get_portfolio().stock_set.filter(stock_ticker=stock.name, sold_at__isnull=True):
+            stock_db.current_price = stock.price
+            stock_db.sold_price = stock.price
+            stock_db.sold_at = now()
+            stock_db.save(update_fields=['current_price', 'sold_price', 'sold_at'])
 
         return stock
