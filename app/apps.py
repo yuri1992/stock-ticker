@@ -19,7 +19,7 @@ class AppConfig(AppConfig):
             s, _ = Strategy.objects.get_or_create(name="strategy2", python_model='app.strategies.corona_watcher')
             s.start_at = now()
             s.save()
-            if os.environ.get('RUN_MAIN', None):
-                Runner.runner(force=False)
+            # if os.environ.get('RUN_MAIN', None):
+            #     Runner.runner(force=False)
         except:
             pass
