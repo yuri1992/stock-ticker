@@ -9,7 +9,7 @@ from django.utils.timezone import now
 from stocks import utils
 from stocks.algorithm import AlgorithmBase
 from stocks.background import BackgroundRunner
-from stocks.constants import TOP_500_STOCKS, TOP_1000_STOCKS
+from stocks.constants import TOP_1000_STOCKS
 from stocks.utils import get_change, run_async
 
 logger = logging.getLogger(__name__)
@@ -84,8 +84,9 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
     def check_stock_in_criteria(self, stock):
         try:
             hist = stock.data.history(period="1mo", auto_adjust=False)
-            price_change = hist.Close[-1] - hist.Close[0]
-            percentage_change = utils.get_change(hist.Close[0], hist.Close[-1])
+            current_price = stock.price
+            price_change = current_price - hist.Close[0]
+            percentage_change = utils.get_change(hist.Close[0], current_price)
             """
                 Checking if the stock has a decrese momentom in the last month.
                 checking if the stock has decrease more than %self.percentage_decrease
@@ -95,12 +96,12 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
                     "Stock %s entered to the watch list, Price at before corona peak ago %s, Price now %s change: %s",
                     stock.name,
                     hist.Close[0],
-                    hist.Close[-1],
+                    current_price,
                     percentage_change)
 
                 self.stock_to_watch.add(stock)
-        except:
-            logger.warn("Error getting data about %s", stock.name)
+        except Exception as e:
+            logger.warn("Error getting data about %s: %s", stock.name, e)
 
     def watch_stocks(self):
         if not self.stock_to_watch:

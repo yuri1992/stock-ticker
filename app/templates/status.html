@@ -1,4 +1,161 @@
 {% extends "layout.html" %}
 {% block body %}
-    <h1>Status</h1>
+    <div class="row mt-5">
+        <div class="col-sm-3">
+            <h1 class="float-start">
+                Status Page
+            </h1>
+
+            {% if runner.running %}
+                <span class="align-middle badge rounded-pill bg-success pull-right">Running</span>
+            {% else %}
+                <span class="align-middle badge rounded-pill bg-danger pull-right">Stop</span>
+            {% endif %}
+        </div>
+
+    </div>
+    <div class="row mt-5">
+        <div class="row">
+            <h2>Currently Running Strategies</h2>
+            <p>Currently Strategies that are loaded into the system.</p>
+        </div>
+        <div class="row">
+            {% if strategies.values %}
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Start At</th>
+                        <th scope="col">Profit</th>
+                        <th scope="col">Open Stocks</th>
+                        <th scope="col">Script</th>
+                        <th scope="col">status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in strategies.values %}
+                        <tr>
+                            <th scope="row">{{ item.obj.id }}</th>
+                            <td>{{ item.obj.name }}</td>
+                            <td>{{ item.obj.description }}</td>
+                            <td>{{ item.obj.start_at }}</td>
+                            <td>{{ item.obj.portfolio.total_profit |floatformat }}$</td>
+                            <td>{{ item.obj.portfolio.stock_open_len }}</td>
+                            <td>{{ item.obj.python_model }}</td>
+                            <td>
+                                {% if item.obj.is_disabled %}
+                                    <span class="badge rounded-pill bg-danger pull-right">Stop</span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-success pull-right">Running</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="bd-callout bd-callout-danger">
+                    <strong>No strategies are running.</strong> <a href="/start">Start it now.</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="row">
+            <h2 data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class="popover-mark">Stocks in
+                Portfolio</h2>
+            <p>
+                Stocks that the strategy already bought, and didn't sell yet.
+            </p>
+        </div>
+        <div class="row">
+            {% for item in strategies.values %}
+                <div class="bd-callout bd-callout-info">
+                    <h4 class="" style="">{{ item.obj.name }}</h4>
+                    <p>
+                        {{ item.obj.description }}
+                    </p>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Stock Ticker</th>
+                            <th scope="col">Buy Price</th>
+                            <th scope="col">Buy Date</th>
+                            <th scope="col">Current Price</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for stock in item.obj.portfolio.open_stocks %}
+                            <tr>
+                                <th scope="row">{{ stock.id }}</th>
+                                <td>{{ stock.stock_ticker }}</td>
+                                <td>{{ stock.price }}</td>
+                                <td>{{ stock.purchase_at }}</td>
+                                <td>{{ stock.price }}$</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="row">
+            <h2>Stocks in Watch for buying</h2>
+            <p>
+                Stocks in watch, which means they pass the first threshold, and we are waiting for signal to buy.
+            </p>
+        </div>
+        <div class="row">
+            {% for item in strategies.values %}
+                <div class="bd-callout bd-callout-info">
+                    <h4 class="" style="">{{ item.obj.name }}</h4>
+                    <p>
+                        {{ item.obj.description }}
+                    </p>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Stock Ticker</th>
+                            <th scope="col">Buy Price</th>
+                            <th scope="col">Buy Date</th>
+                            <th scope="col">Current Price</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for stock in item.thread.stock_to_watch %}
+                            <tr>
+                                <th scope="row">{{ stock.id }}</th>
+                                <td>{{ stock.stock_name }}</td>
+                                <td>{{ stock.last_price }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function (event) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+
+        });
+    </script>
 {% endblock %}

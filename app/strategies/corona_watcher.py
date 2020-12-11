@@ -80,7 +80,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
     @run_async
     def check_stock_in_criteria(self, stock):
         try:
-            price_now = stock.data.history(period="1d", auto_adjust=False).Close[0]
+            price_now = stock.price
             corona_price = stock.data.history(start="2020-03-23", end="2020-03-24", auto_adjust=False).Close[0]
             price_before_corona = stock.data.history(start="2020-01-23", end="2020-01-24", auto_adjust=False).Close[0]
 
@@ -94,8 +94,8 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
                             corona_price)
 
                 self.stock_to_watch.add(stock)
-        except:
-            logger.warn("Error getting data about %s", stock.name)
+        except Exception as e:
+            logger.warn("Error getting data about %s: %s", stock.name, e)
 
     def watch_stocks(self):
         if not self.stock_to_watch:

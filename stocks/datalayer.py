@@ -1,24 +1,34 @@
 import logging
+from threading import RLock
 
 import yfinance as yf
+from cachetools import TTLCache, cached, cachedmethod
 
 logger = logging.getLogger(__name__)
 
 
-class YahooFinanceMixin:
+class YahooFinanceCache:
     def __init__(self, *args, **kwargs):
-        super(YahooFinanceMixin, self).__init__(*args, **kwargs)
+        super(YahooFinanceCache, self).__init__(*args, **kwargs)
         self._cache = {}
 
-    def get_stock(self, stock_name):
-        if stock_name not in self._cache:
-            self._cache[stock_name] = LiveStock.from_stock_name(stock_name)
-        return self._cache[stock_name]
+    def get(self, stock_name):
+        return self._cache.get(stock_name)
+
+    def set(self, stock_name, stock):
+        self._cache[stock_name] = stock
+
+
+YahooFinanceCache = YahooFinanceCache()
+
+cache = TTLCache(maxsize=1024, ttl=30)
+lock = RLock()
 
 
 class LiveStock:
     def __init__(self, stock_name, yfstock=None):
         self.stock_name = stock_name
+        self._last_price = None
         if yfstock is None:
             self.data = yf.Ticker(stock_name)
 
@@ -29,22 +39,31 @@ class LiveStock:
     def name(self):
         return self.stock_name
 
-    @property
-    def price(self):
+    @cached(cache)
+    def _price(self):
         try:
-            return self.data.history(period="1d", auto_adjust=False).Close[0]
+            close_ = self.data.history(period="1d", auto_adjust=False).Close[0]
+            self._last_price = close_
+            return close_
         except:
             return 0
 
+    @property
+    def price(self):
+        return self._price()
+
+    @property
+    def last_price(self):
+        return self._last_price
+
     @classmethod
     def from_stock_name(cls, stock_name):
-        stock = LiveStock(stock_name)
-        stock.data = yf.Ticker(stock_name)
-        # try:
-        #     if stock.get_close_price():
-        #         return stock
-        # except:
-        #     logger.error("Error fetching data on stock")
+        stock = YahooFinanceCache.get(stock_name)
+        if not stock:
+            stock = LiveStock(stock_name)
+            stock.data = yf.Ticker(stock_name)
+            YahooFinanceCache.set(stock_name, stock)
+            return stock
         return stock
 
     def get_close_price(self, period="1d"):

@@ -1480,8 +1480,8 @@ def filter_nan(lst):
     return [x for x in lst if x is not None]
 
 
-TOP_100_STOCKS = filter_nan([LiveStock.from_stock_name(x) for x in TOP_100_STOCKS_SYMBOLS])
+TOP_1000_STOCKS = [LiveStock.from_stock_name(x) for x in TOP_1000_STOCKS_SYMBOLS]
 
-TOP_500_STOCKS = filter_nan([LiveStock.from_stock_name(x) for x in TOP_500_STOCKS_SYMBOLS])
+TOP_500_STOCKS = [LiveStock.from_stock_name(x) for x in TOP_500_STOCKS_SYMBOLS]
 
-TOP_1000_STOCKS = filter_nan([LiveStock.from_stock_name(x) for x in TOP_1000_STOCKS_SYMBOLS])
+TOP_100_STOCKS = [LiveStock.from_stock_name(x) for x in TOP_100_STOCKS_SYMBOLS]

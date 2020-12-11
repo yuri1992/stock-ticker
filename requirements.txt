@@ -18,3 +18,5 @@ bdateutil
 gunicorn
 
 django-heroku
+
+cachetools
