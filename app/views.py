@@ -1,4 +1,5 @@
 import logging
+from threading import Thread
 
 from django.http import HttpResponse
 from django.views.generic import TemplateView
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def index(request):
-    Runner.runner(force=False)
+    Thread(target=Runner.runner(force=False)).start()
     logger.info("started via http request")
     return HttpResponse("Started.")
 
