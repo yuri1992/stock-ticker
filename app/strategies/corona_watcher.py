@@ -1,7 +1,9 @@
 import logging
+import time
 from collections import deque
 from datetime import timedelta
 
+from bdateutil import isbday
 from django.utils.timezone import now
 
 from stocks import utils
@@ -45,10 +47,10 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
     def run(self):
         super(MyStrategy, self).run()
 
-        # if self.run_on_business_days and not isbday(now()):
-        #     logger.info("%s is not a business day, we are going to sleep", now())
-        #     time.sleep(60 * 30)
-        #     return None
+        if self.run_on_business_days and not isbday(now()):
+            logger.info("%s is not a business day, we are going to sleep", now())
+            time.sleep(60 * 30)
+            return None
 
         already_purchased_stocks = set()
         self.watch_stock_to_sell(already_purchased_stocks)
@@ -59,7 +61,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
         for stock in self.get_open_stocks():
             already_purchased_stocks.add(stock.live)
             change = get_change(stock.live.price, stock.price)
-            if change >= self.sell_threshold:
+            if change >= self.sell_threshold and stock.price < stock.live.price:
                 logger.info("We are bought the stock %s in price of %s sell in price of %s",
                             stock.stock_ticker,
                             stock.price,

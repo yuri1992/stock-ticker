@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def index(request):
-    Thread(target=Runner.runner(force=False)).start()
+    Thread(target=Runner.runner, kwargs={"force": False}).start()
     logger.info("started via http request")
     return HttpResponse("Started.")
 

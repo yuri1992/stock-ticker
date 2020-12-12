@@ -62,7 +62,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
         for stock in self.get_open_stocks():
             already_purchased_stocks.add(stock.live)
             change = get_change(stock.live.price, stock.price)
-            if change >= self.sell_threshold:
+            if change >= self.sell_threshold and stock.price < stock.live.price:
                 logger.info("We are bought the stock %s in price of %s sell in price of %s",
                             stock.stock_ticker,
                             stock.price,
