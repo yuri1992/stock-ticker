@@ -39,4 +39,4 @@ def run_async(func):
     return async_func
 
 
-THREAD_POOL = ThreadPoolExecutor(max_workers=5)
+THREAD_POOL = ThreadPoolExecutor(max_workers=20)
