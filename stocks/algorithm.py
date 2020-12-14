@@ -50,6 +50,9 @@ class AlgorithmBase:
         return self.get_portfolio().stock_set.filter(sold_at__isnull=True)
 
     def buy_stock(self, stock: LiveStock, quantity=1000):
+        if Stock.objects.filter(stock_ticker=stock.name, sold_at__isnull=False):
+            logger.info("Can't buy a stock which already in protfolio ")
+            return None
         return Stock.objects.create(
             stock_ticker=stock.name,
             quantity=quantity,
