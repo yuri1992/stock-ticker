@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 class AlgorithmBase:
+    STOCK_PRICE_BUCKET = 2500
+
     def __init__(self, strategy_name=None, sell_threshold=2, interval=4, *args, **kwargs):
         super(AlgorithmBase, self).__init__()
         self.algo = Strategy.objects.get(name=strategy_name or self.__class__.__name__)
@@ -22,6 +24,7 @@ class AlgorithmBase:
 
         self.sleep_time = 60
         self.sell_threshold = sell_threshold
+        self.stop_sell_threshold = 2
         self.interval = interval
 
         # We are checking for 3 times in a row increase in price between the intervals
@@ -53,6 +56,8 @@ class AlgorithmBase:
         if Stock.objects.filter(stock_ticker=stock.name, sold_at__isnull=False):
             logger.info("Can't buy a stock which already in protfolio ")
             return None
+
+        quantity = max(int(self.STOCK_PRICE_BUCKET / stock.price), 1)
         return Stock.objects.create(
             stock_ticker=stock.name,
             quantity=quantity,
@@ -86,6 +91,12 @@ class AlgorithmBase:
             change = get_change(stock.live.price, stock.price)
             if change >= self.sell_threshold and stock.price < stock.live.price:
                 logger.info("We are bought the stock %s in price of %s sell in price of %s",
+                            stock.stock_ticker,
+                            stock.price,
+                            stock.live.price)
+                self.sell_stock(stock.live)
+            elif change >= self.stop_sell_threshold and stock.price > stock.live.price:
+                logger.info("Selling in lose, We are bought the stock %s in price of %s sell in price of %s",
                             stock.stock_ticker,
                             stock.price,
                             stock.live.price)

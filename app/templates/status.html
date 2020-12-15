@@ -185,6 +185,73 @@
     </div>
 
 
+    <div class="row mt-5">
+        <div class="row">
+            <h2 data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class="popover-mark">
+                Closed Positions
+            </h2>
+            <p>
+                Stocks that been sold
+            </p>
+        </div>
+        <div class="row">
+            {% for item in strategies.values %}
+                <div class="bd-callout bd-callout-info">
+                    <h4 class="" style="">{{ item.obj.name }}</h4>
+                    <p>
+                        {{ item.obj.description }}
+                    </p>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Stock Ticker</th>
+                            <th scope="col">Buy Price</th>
+                            <th scope="col">Buy Date</th>
+                            <th scope="col">Sold Price</th>
+                            <th scope="col">Sold Date</th>
+                            <th scope="col">Change</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for stock in item.obj.portfolio.close_stocks %}
+                            <tr>
+                                <th scope="row">{{ stock.id }}</th>
+                                <td>
+                                    {{ stock.stock_ticker }}
+                                    <a href="https://finance.yahoo.com/quote/{{ stock.stock_ticker }}/" target="_blank">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd"
+                                                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                            <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                                            <circle cx="8" cy="4.5" r="1"/>
+                                        </svg>
+                                    </a>
+                                </td>
+                                <td>{{ stock.price |floatformat }}</td>
+                                <td>{{ stock.purchase_at }}</td>
+                                <td>{{ stock.sold_price |floatformat }}$</td>
+                                <td>{{ stock.sold_at }}</td>
+                                {% percentage_change stock.price stock.live.last_price as percetage %}
+                                <td>
+                                    {% if percetage < 0 %}
+                                        <span class="badge rounded-pill bg-danger">{{ percetage }}%</span>
+                                    {% else %}
+                                        <span class="badge rounded-pill bg-success">{{ percetage }}%</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function (event) {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

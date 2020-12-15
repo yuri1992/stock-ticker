@@ -42,6 +42,9 @@ class Portfolio(models.Model):
     def open_stocks(self):
         return self.stock_set.filter(sold_at__isnull=True)
 
+    def close_stocks(self):
+        return self.stock_set.filter(sold_at__isnull=False)
+
     @property
     def stock_open_len(self):
         return len(self.open_stocks())
