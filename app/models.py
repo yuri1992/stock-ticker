@@ -26,7 +26,7 @@ class Portfolio(models.Model):
         return total
 
     def open_stocks(self):
-        return self.stock_set.filter(sold_at__isnull=False)
+        return self.stock_set.filter(sold_at__isnull=True)
 
     @property
     def stock_open_len(self):

@@ -4,14 +4,13 @@ from stocks import utils
 from stocks.algorithm import AlgorithmBase
 from stocks.background import BackgroundRunner
 from stocks.constants import TOP_1000_STOCKS
+from stocks.datalayer import LiveStock
 from stocks.utils import run_async
 
 logger = logging.getLogger(__name__)
 
 
 class MyStrategy(AlgorithmBase, BackgroundRunner):
-    STOCK_LIST = TOP_1000_STOCKS
-
     def __init__(self, sell_threshold=2, interval=15, percentage_decrease=11, number_of_increase_in_row=4,
                  run_on_business_days=False,
                  *args,
@@ -31,6 +30,10 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
 
         self.run_on_business_days = run_on_business_days
 
+        # We are checking for stock that decreased in 11%
+        self.percentage_decrease = percentage_decrease
+        self.STOCK_LIST = TOP_1000_STOCKS
+
         self.last_time = None
         self.last_time_find_criteria = None
         self.init()
@@ -39,14 +42,14 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
         pass
 
     @run_async
-    def check_stock_in_criteria(self, stock):
+    def check_stock_in_criteria(self, stock: LiveStock):
         try:
             price_now = stock.price
             corona_price = stock.data.history(start="2020-03-23", end="2020-03-24", auto_adjust=False).Close[0]
             price_before_corona = stock.data.history(start="2020-01-23", end="2020-01-24", auto_adjust=False).Close[0]
 
             if price_now < price_before_corona and \
-                    utils.get_change(price_now, price_before_corona) > 30 and \
+                    utils.get_change(price_now, price_before_corona) > 20 and \
                     corona_price > price_now:
                 logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s, Price at CoronaPeak %s",
                             stock.name,

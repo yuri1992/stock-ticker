@@ -2,7 +2,7 @@ import logging
 from threading import RLock
 
 import yfinance as yf
-from cachetools import TTLCache, cached, cachedmethod
+from cachetools import TTLCache, cached
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class YahooFinanceCache:
 
 YahooFinanceCache = YahooFinanceCache()
 
-cache = TTLCache(maxsize=1024, ttl=30)
+cache = TTLCache(maxsize=1024, ttl=5)
 lock = RLock()
 
 
@@ -42,11 +42,12 @@ class LiveStock:
     @cached(cache)
     def _price(self):
         try:
-            close_ = self.data.history(period="1d", auto_adjust=False).Close[0]
+            close_ = self.data.history(period="1d", interval="1m", auto_adjust=False).Close[-1]
             self._last_price = close_
             return close_
-        except:
-            return 0
+        except Exception as e:
+            logger.error(e)
+            return None
 
     @property
     def price(self):
@@ -67,7 +68,7 @@ class LiveStock:
         return stock
 
     def get_close_price(self, period="1d"):
-        return self.data.history(period=period, auto_adjust=False).Close[0]
+        return self.data.history(period=period, interval="1m", auto_adjust=False).Close[-1]
 
     def get_open_price(self, period="1d"):
         return self.data.history(period=period, auto_adjust=False).Open[0]

@@ -90,7 +90,7 @@ TOP_500_STOCKS_SYMBOLS = [
     "BSX",
     "BMY",
     "AVGO",
-    "BR",
+
     # "BF.B",
     "CHRW",
     "COG",
@@ -124,7 +124,7 @@ TOP_500_STOCKS_SYMBOLS = [
     "CTXS",
     "CLX",
     "CME",
-    "CMS",
+
     "KO",
     "CTSH",
     "CL",
@@ -133,7 +133,7 @@ TOP_500_STOCKS_SYMBOLS = [
     "CAG",
     "CXO",
     "COP",
-    "ED",
+
     "STZ",
     "COO",
     "CPRT",
@@ -492,7 +492,7 @@ TOP_500_STOCKS_SYMBOLS = [
     "WAT",
     "WEC",
     "WFC",
-    "WELL",
+
     "WST",
     "WDC",
     "WU",
@@ -656,7 +656,7 @@ TOP_1000_STOCKS_SYMBOLS = [
     "BMY",
     "BRX",
     "AVGO",
-    "BR",
+
     "BPYU",
     "BRO",
 
@@ -680,7 +680,7 @@ TOP_1000_STOCKS_SYMBOLS = [
     "CSL",
     "KMX",
     "CCL",
-    "CRI",
+
     "CASY",
     "CTLT",
     "CAT",
@@ -703,7 +703,7 @@ TOP_1000_STOCKS_SYMBOLS = [
     "CVX",
     "CIM",
     "CMG",
-    "CHH",
+
     "CB",
     "CHD",
     "CI",
@@ -716,20 +716,20 @@ TOP_1000_STOCKS_SYMBOLS = [
     "C",
     "CFG",
     "CTXS",
-    "CLH",
+
     "CLX",
     "CME",
-    "CMS",
-    "CNA",
+
+
     "CNX",
     "KO",
     "CGNX",
     "CTSH",
     "COHR",
-    "CFX",
+
     "CL",
     "CLNY",
-    "CXP",
+
     "COLM",
     "CMCSA",
     "CMA",
@@ -745,13 +745,13 @@ TOP_1000_STOCKS_SYMBOLS = [
     "CPA",
     "CPRT",
     "CLGX",
-    "COR",
+
     "GLW",
     "OFC",
     "CSGP",
     "COST",
     "COTY",
-    "CR",
+
     "CACC",
     "CCI",
     "CCK",
@@ -1435,7 +1435,7 @@ TOP_1000_STOCKS_SYMBOLS = [
     "WEX",
     "WY",
     "WHR",
-    "WTM",
+
     "WLL",
 
     "WMB",
@@ -1445,7 +1445,7 @@ TOP_1000_STOCKS_SYMBOLS = [
     "WDAY",
 
     "WPX",
-    "WYND",
+
     "WH",
 
     "VICI",

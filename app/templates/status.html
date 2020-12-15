@@ -88,6 +88,7 @@
                             <th scope="col">Buy Price</th>
                             <th scope="col">Buy Date</th>
                             <th scope="col">Current Price</th>
+                            <th scope="col">Change</th>
 
                         </tr>
                         </thead>
@@ -110,7 +111,14 @@
                                 <td>{{ stock.price |floatformat }}</td>
                                 <td>{{ stock.purchase_at }}</td>
                                 <td>{{ stock.live.last_price |floatformat }}$</td>
-                                <td>{% percentage_change stock.price stock.live.last_price %}$</td>
+                                {% percentage_change stock.price stock.live.last_price as percetage %}
+                                <td>
+                                    {% if percetage < 0 %}
+                                        <span class="badge rounded-pill bg-danger">{{ percetage }}%</span>
+                                    {% else %}
+                                        <span class="badge rounded-pill bg-success">{{ percetage }}%</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -137,7 +145,6 @@
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th scope="col">#</th>
                             <th scope="col">Stock Ticker</th>
                             <th scope="col">Current Price</th>
                             <th scope="col">Last Prices</th>
@@ -146,7 +153,6 @@
                         <tbody>
                         {% for stock in item.thread.stock_to_watch %}
                             <tr>
-                                <th scope="row">{{ stock.id }}</th>
                                 <td>
                                     {{ stock.stock_name }}
                                     <a href="https://finance.yahoo.com/quote/{{ stock.stock_name }}" target="_blank">
@@ -160,11 +166,11 @@
                                     </a>
                                 </td>
                                 <td>{{ stock.last_price | floatformat }}</td>
-
                                 <td>
-                                    {#                        {% for h_price in item.thread.stock_watcher[stock_name] %}#}
-                                    {#                        {{ h_price }}#}
-                                    {#                        {% endofor %}#}
+                                    {% get_key item.thread.stock_watcher stock.stock_name as watch_prices %}
+                                    {% for h_price in watch_prices.history_prices %}
+                                        {{ h_price | floatformat }}
+                                    {% endfor %}
                                 </td>
                                 <td></td>
                             </tr>
