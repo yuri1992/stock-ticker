@@ -31,6 +31,7 @@
                         <th scope="col">Description</th>
                         <th scope="col">Start At</th>
                         <th scope="col">Profit</th>
+                        <th scope="col">Percentage</th>
                         <th scope="col">Open Stocks</th>
                         <th scope="col">Script</th>
                         <th scope="col">status</th>
@@ -44,6 +45,7 @@
                             <td>{{ item.obj.description }}</td>
                             <td>{{ item.obj.start_at }}</td>
                             <td>{{ item.obj.portfolio.total_profit |floatformat }}$</td>
+                            <td>{{ item.obj.portfolio.total_percentage_change |floatformat }}%</td>
                             <td>{{ item.obj.portfolio.stock_open_len }}</td>
                             <td>{{ item.obj.python_model }}</td>
                             <td>

@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import formats
 from jsonfield import JSONField
 
+from stocks import utils
+
 
 class Strategy(models.Model):
     name = models.CharField(max_length=256)
@@ -25,6 +27,18 @@ class Portfolio(models.Model):
             total += stock.profit()
         return total
 
+    def total_percentage_change(self):
+        count = 0
+        total = 0
+        for stock in self.stock_set.filter(sold_at__isnull=False):
+            total += stock.percentage()
+            count += 1
+
+        if count == 0:
+            return 0
+
+        return total / count
+
     def open_stocks(self):
         return self.stock_set.filter(sold_at__isnull=True)
 
@@ -34,6 +48,7 @@ class Portfolio(models.Model):
 
     def __str__(self):
         return f"Algorithm {self.algo.name}, Total Profit: {self.total_profit()}"
+
 
 class Stock(models.Model):
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
@@ -54,6 +69,21 @@ class Stock(models.Model):
     def profit(self):
         if self.sold_price:
             return (self.sold_price - self.price) * self.quantity
+        return 0
+
+    def percentage(self):
+        if not self.sold_price:
+            return 0
+
+        p1 = self.price
+        p2 = self.sold_price
+        if p1 and p2:
+            if p1 == p2:
+                return 0
+            change = utils.get_change(p1, p2)
+            minus = -1 if p1 > p2 else 1
+            change *= minus
+            return round(change, 2)
         return 0
 
     def __str__(self):
