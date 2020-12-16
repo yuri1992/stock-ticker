@@ -4,6 +4,7 @@ import signal
 from threading import Event
 
 from app.models import Strategy
+from stocks.utils import THREAD_POOL
 
 log = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ class Runner:
     def exit_gracefully(self, signum, frame):
         self.kill_now = True
         self.stop()
+        THREAD_POOL.shutdown()
 
     def check_status(self):
         for strategy, thread in self.running_strategies.items():
@@ -35,7 +37,7 @@ class Runner:
             thread.join()
 
     @staticmethod
-    def run_strategy(strategy, exit_event=Event(), start_thread=False):
+    def run_strategy(strategy, exit_event=None, start_thread=False):
         module = getattr(importlib.import_module(strategy.python_model), 'MyStrategy')
         arguments = strategy.python_arguments or ()
         kwargs = strategy.python_kwargs or {}
@@ -47,13 +49,13 @@ class Runner:
 
     def runner(self, force=True):
         strategies = Strategy.objects.filter(start_at__isnull=False)
-        
+
         if not self.running or force:
             self.running = True
             for strategy in strategies:
                 if strategy.id in self.running_strategies:
                     continue
-    
+
                 try:
                     instance, thread_id = self.run_strategy(strategy, exit_event=self.exit_event, start_thread=True)
                     self.running_strategies[strategy.id] = {

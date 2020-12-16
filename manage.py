@@ -2,6 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import re
+import signal
 import sys
 
 
@@ -41,6 +42,17 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
+
+# def graceful_shutdown(signal, frame):
+#     try:
+#         from app.runner import Runner
+#         Runner.exit_event.set()
+#
+#     finally:
+#         sys.exit()
+#
+#
+# signal.signal(signal.SIGTERM, graceful_shutdown)
 
 if __name__ == '__main__':
     main()

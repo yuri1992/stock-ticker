@@ -92,11 +92,11 @@ class AlgorithmBase:
 
     def is_trade_open(self):
         d = now()
-        return isbday(d) and d.hour > 14 and d.minute > 30
+        return isbday(d) and (d.hour > 14 or (d.hour == 14 and d.minute > 30))
 
     def time_to_trade_open(self):
         d = now()
-        if d.hour > 21:
+        if d.hour >= 21:
             return now().replace(hour=14, minute=30, second=0, microsecond=0) + timedelta(days=1) - now()
 
         return now().replace(hour=14, minute=30, second=0, microsecond=0) - now()
@@ -202,7 +202,7 @@ class AlgorithmBase:
     def run(self):
         if self.run_on_business_days and not self.is_trading_day():
             trade_open = self.time_to_trade_open()
-            logger.info("%s is not a business day, we are going to sleep, trade will open in %s", now(), trade_open)
+            logger.info("%s is  not a business day, we are going to sleep, trade will open in %s", now(), trade_open)
             time.sleep(60 * 30)
             return None
 

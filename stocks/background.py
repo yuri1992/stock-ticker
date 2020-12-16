@@ -17,6 +17,7 @@ class BackgroundRunner:
 
     def start(self):
         self.thread = Thread(target=self._run)
+        # self.thread.daemon = True
         self.thread.start()
         return self.thread
 
@@ -27,4 +28,4 @@ class BackgroundRunner:
     def _run(self):
         while not self.exit_event.is_set():
             self.run()
-            time.sleep(self.sleep_time)
+            self.exit_event.wait(self.sleep_time)
