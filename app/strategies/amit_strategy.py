@@ -38,10 +38,10 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
     @run_async
     def check_stock_in_criteria(self, stock):
         try:
-            hist = stock.data.history(period="1mo", auto_adjust=False)
+            hist = stock.get_price_at(period="1mo", auto_adjust=False).Close[0]
             current_price = stock.price
-            price_change = current_price - hist.Close[0]
-            percentage_change = utils.get_change(hist.Close[0], current_price)
+            price_change = current_price - hist
+            percentage_change = utils.get_change(hist, current_price)
             """
                 Checking if the stock has a decrese momentom in the last month.
                 checking if the stock has decrease more than %self.percentage_decrease
@@ -50,7 +50,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
                 logger.info(
                     "Stock %s entered to the watch list, Price at before corona peak ago %s, Price now %s change: %s",
                     stock.name,
-                    hist.Close[0],
+                    hist,
                     current_price,
                     percentage_change)
 

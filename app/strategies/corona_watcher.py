@@ -45,12 +45,12 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
     def check_stock_in_criteria(self, stock: LiveStock):
         try:
             price_now = stock.price
-            corona_price = stock.data.history(start="2020-03-23", end="2020-03-24", auto_adjust=False).Close[0]
-            price_before_corona = stock.data.history(start="2020-01-23", end="2020-01-24", auto_adjust=False).Close[0]
+            corona_price = stock.get_price_at(start="2020-03-23", end="2020-03-24", auto_adjust=False).Close[0]
+            price_before_corona = stock.get_price_at(start="2020-01-23", end="2020-01-24", auto_adjust=False).Close[0]
 
             if price_now < price_before_corona and \
                     utils.get_change(price_now, price_before_corona) > 20 and \
-                    corona_price > price_now:
+                    utils.get_change(price_now, corona_price) > 20:
                 logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s, Price at CoronaPeak %s",
                             stock.name,
                             price_before_corona,

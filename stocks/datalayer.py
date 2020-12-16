@@ -22,6 +22,7 @@ class YahooFinanceCache:
 YahooFinanceCache = YahooFinanceCache()
 
 cache = TTLCache(maxsize=1024, ttl=5)
+long_cache = TTLCache(maxsize=1024, ttl=60 * 60 * 24)
 lock = RLock()
 
 
@@ -66,6 +67,10 @@ class LiveStock:
             YahooFinanceCache.set(stock_name, stock)
             return stock
         return stock
+
+    @cached(long_cache)
+    def get_price_at(self, period=None, start=None, end=None, auto_adjust=False):
+        return self.data.history(period=period, start=start, end=end, auto_adjust=False)
 
     def get_close_price(self, period="1d"):
         return self.data.history(period=period, interval="1m", auto_adjust=False).Close[-1]

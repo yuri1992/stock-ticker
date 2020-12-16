@@ -31,6 +31,7 @@ class AlgorithmBase:
 
         # We are checking for 3 times in a row increase in price between the intervals
         self.number_of_increase_in_row = 4
+        self.minutes_between_increase_in_row = 5
 
         self.last_time = None
         self.last_time_find_criteria = None
@@ -164,7 +165,7 @@ class AlgorithmBase:
         if not self.stock_to_watch:
             return
 
-        if self.last_time and now() - self.last_time < timedelta(minutes=3):
+        if self.last_time and now() - self.last_time < timedelta(minutes=self.minutes_between_increase_in_row):
             return
 
         self.last_time = now()
@@ -197,6 +198,7 @@ class AlgorithmBase:
                             self.number_of_increase_in_row,
                             self.interval)
                 self.buy_stock(stock)
+                self.clear_stock_history(stock)
                 self.stock_to_watch.remove(stock)
 
     def run(self):

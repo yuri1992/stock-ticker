@@ -234,14 +234,15 @@
                                 <td>{{ stock.purchase_at }}</td>
                                 <td>{{ stock.sold_price |floatformat }}$</td>
                                 <td>{{ stock.sold_at }}</td>
-                                {% percentage_change stock.price stock.live.last_price as percetage %}
-                                <td>
-                                    {% if percetage < 0 %}
-                                        <span class="badge rounded-pill bg-danger">{{ percetage }}%</span>
-                                    {% else %}
-                                        <span class="badge rounded-pill bg-success">{{ percetage }}%</span>
-                                    {% endif %}
-                                </td>
+                                {% with stock.percentage as percetage %}
+                                    <td>
+                                        {% if percetage < 0 %}
+                                            <span class="badge rounded-pill bg-danger">{{ percetage }}%</span>
+                                        {% else %}
+                                            <span class="badge rounded-pill bg-success">{{ percetage }}%</span>
+                                        {% endif %}
+                                    </td>
+                                {% endwith %}
                             </tr>
                         {% endfor %}
                         </tbody>
