@@ -11,6 +11,8 @@ from app.models import Strategy, Portfolio, Stock
 from stocks.datalayer import LiveStock
 from stocks.utils import get_change
 
+SELL_BEFORE_CLOSE_FACTOR = 0.9
+
 logger = logging.getLogger(__name__)
 
 
@@ -53,7 +55,7 @@ class AlgorithmBase:
         return self.get_portfolio().stock_set.filter(sold_at__isnull=True)
 
     def buy_stock(self, stock: LiveStock, quantity=1000):
-        if Stock.objects.filter(stock_ticker=stock.name, sold_at__isnull=False):
+        if Stock.objects.filter(stock_ticker=stock.name, sold_at__isnull=True).exists():
             logger.info("Can't buy a stock which already in protfolio ")
             return None
 
@@ -85,7 +87,31 @@ class AlgorithmBase:
             'sell_price': None,
         }
 
+    def is_trading_day(self):
+        return isbday(now())
+
+    def is_trade_open(self):
+        d = now()
+        return isbday(d) and d.hour > 14 and d.minute > 30
+
+    def time_to_trade_open(self):
+        d = now()
+        if d.hour > 21:
+            return now().replace(hour=14, minute=30, second=0, microsecond=0) + timedelta(days=1) - now()
+
+        return now().replace(hour=14, minute=30, second=0, microsecond=0) - now()
+
+    def time_to_trade_close(self):
+        if not self.is_trade_open():
+            return None
+
+        market_close = now().replace(hour=21, minute=0, second=0, microsecond=0)
+        return market_close - now()
+
     def watch_stock_to_sell(self, already_purchased_stocks):
+        if not self.is_trade_open():
+            return
+
         for stock in self.get_open_stocks():
             already_purchased_stocks.add(stock.live)
             change = get_change(stock.live.price, stock.price)
@@ -101,6 +127,17 @@ class AlgorithmBase:
                             stock.price,
                             stock.live.price)
                 self.sell_stock(stock.live)
+            elif self.is_trade_open() and self.time_to_trade_close() < timedelta(hours=1):
+                """
+                    We want to sell before day close,
+                    We will sell stock we have a positve change even if it's not in the threshold
+                """
+                if change >= (self.sell_threshold * SELL_BEFORE_CLOSE_FACTOR) and stock.price < stock.live.price:
+                    logger.info("Sell before close, We are bought the stock %s in price of %s sell in price of %s",
+                                stock.stock_ticker,
+                                stock.price,
+                                stock.live.price)
+                    self.sell_stock(stock.live)
 
     def find_stocks_in_criteria(self, already_purchased_stocks):
         if self.last_time_find_criteria and now() - self.last_time_find_criteria < timedelta(minutes=self.interval):
@@ -121,6 +158,9 @@ class AlgorithmBase:
         raise NotImplemented
 
     def watch_stocks(self):
+        if not self.is_trade_open():
+            return
+
         if not self.stock_to_watch:
             return
 
@@ -160,8 +200,9 @@ class AlgorithmBase:
                 self.stock_to_watch.remove(stock)
 
     def run(self):
-        if self.run_on_business_days and not isbday(now()):
-            logger.info("%s is not a business day, we are going to sleep", now())
+        if self.run_on_business_days and not self.is_trade_open():
+            trade_open = self.time_to_trade_open()
+            logger.info("%s is not a business day, we are going to sleep, trade will open in %s", now(), trade_open)
             time.sleep(60 * 30)
             return None
 
