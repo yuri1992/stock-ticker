@@ -200,7 +200,7 @@ class AlgorithmBase:
                 self.stock_to_watch.remove(stock)
 
     def run(self):
-        if self.run_on_business_days and not self.is_trade_open():
+        if self.run_on_business_days and not self.is_trading_day():
             trade_open = self.time_to_trade_open()
             logger.info("%s is not a business day, we are going to sleep, trade will open in %s", now(), trade_open)
             time.sleep(60 * 30)
