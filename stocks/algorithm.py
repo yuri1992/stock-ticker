@@ -139,6 +139,8 @@ class AlgorithmBase:
                                 stock.price,
                                 stock.live.price)
                     self.sell_stock(stock.live)
+                elif stock.price > stock.live.price:
+                    self.sell_stock(stock.live)
 
     def find_stocks_in_criteria(self, already_purchased_stocks):
         if self.last_time_find_criteria and now() - self.last_time_find_criteria < timedelta(minutes=self.interval):
