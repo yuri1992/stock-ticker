@@ -11,7 +11,7 @@ from app.models import Strategy, Portfolio, Stock
 from stocks.datalayer import LiveStock
 from stocks.utils import get_change
 
-SELL_BEFORE_CLOSE_FACTOR = 0.9
+SELL_BEFORE_CLOSE_FACTOR = 0.1
 
 logger = logging.getLogger(__name__)
 
