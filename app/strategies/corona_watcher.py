@@ -50,7 +50,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
 
             if price_now < price_before_corona and \
                     utils.get_change(price_now, price_before_corona) > 20 and \
-                    utils.get_change(price_now, corona_price) > 20:
+                    utils.get_change(price_now, corona_price) > 100:
                 logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s, Price at CoronaPeak %s",
                             stock.name,
                             price_before_corona,
