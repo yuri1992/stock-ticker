@@ -48,7 +48,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
             corona_price = stock.get_price_at(start="2020-03-23", end="2020-03-24", auto_adjust=False).Close[0]
             price_before_corona = stock.get_price_at(start="2020-01-23", end="2020-01-24", auto_adjust=False).Close[0]
 
-            if price_now < price_before_corona and \
+            if price_before_corona > price_now > corona_price and \
                     utils.get_change(price_now, price_before_corona) > 20 and \
                     utils.get_change(price_now, corona_price) > 100:
                 logger.info("Stock %s entered to the watch list, Price ago %s, Price now %s, Price at CoronaPeak %s",
