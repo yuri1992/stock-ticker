@@ -23,42 +23,44 @@
         </div>
         <div class="row">
             {% if strategies.values %}
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Start At</th>
-                        <th scope="col">Profit</th>
-                        <th scope="col">Percentage</th>
-                        <th scope="col">Open Stocks</th>
-                        <th scope="col">Script</th>
-                        <th scope="col">status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in strategies.values %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
                         <tr>
-                            <th scope="row">{{ item.obj.id }}</th>
-                            <td>{{ item.obj.name }}</td>
-                            <td>{{ item.obj.description }}</td>
-                            <td>{{ item.obj.start_at }}</td>
-                            <td>{{ item.obj.portfolio.total_profit |floatformat }}$</td>
-                            <td>{{ item.obj.portfolio.total_percentage_change |floatformat }}%</td>
-                            <td>{{ item.obj.portfolio.stock_open_len }}</td>
-                            <td>{{ item.obj.python_model }}</td>
-                            <td>
-                                {% if item.obj.is_disabled %}
-                                    <span class="badge rounded-pill bg-danger pull-right">Stop</span>
-                                {% else %}
-                                    <span class="badge rounded-pill bg-success pull-right">Running</span>
-                                {% endif %}
-                            </td>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Start At</th>
+                            <th scope="col">Profit</th>
+                            <th scope="col">Percentage</th>
+                            <th scope="col">Open Stocks</th>
+                            <th scope="col">Script</th>
+                            <th scope="col">status</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {% for item in strategies.values %}
+                            <tr>
+                                <th scope="row">{{ item.obj.id }}</th>
+                                <td>{{ item.obj.name }}</td>
+                                <td>{{ item.obj.description }}</td>
+                                <td>{{ item.obj.start_at }}</td>
+                                <td>{{ item.obj.portfolio.total_profit |floatformat }}$</td>
+                                <td>{{ item.obj.portfolio.total_percentage_change |floatformat }}%</td>
+                                <td>{{ item.obj.portfolio.stock_open_len }}</td>
+                                <td>{{ item.obj.python_model }}</td>
+                                <td>
+                                    {% if item.obj.is_disabled %}
+                                        <span class="badge rounded-pill bg-danger pull-right">Stop</span>
+                                    {% else %}
+                                        <span class="badge rounded-pill bg-success pull-right">Running</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <div class="bd-callout bd-callout-danger">
                     <strong>No strategies are running.</strong> <a href="/start">Start it now.</a>
@@ -82,49 +84,52 @@
                     <p>
                         {{ item.obj.description }}
                     </p>
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Stock Ticker</th>
-                            <th scope="col">Buy Price</th>
-                            <th scope="col">Buy Date</th>
-                            <th scope="col">Current Price</th>
-                            <th scope="col">Change</th>
-
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for stock in item.obj.portfolio.open_stocks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
                             <tr>
-                                <th scope="row">{{ stock.id }}</th>
-                                <td>
-                                    {{ stock.stock_ticker }}
-                                    <a href="https://finance.yahoo.com/quote/{{ stock.stock_ticker }}/" target="_blank">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                             fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd"
-                                                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                            <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
-                                            <circle cx="8" cy="4.5" r="1"/>
-                                        </svg>
-                                    </a>
-                                </td>
-                                <td>{{ stock.price |floatformat }}</td>
-                                <td>{{ stock.purchase_at }}</td>
-                                <td>{{ stock.live.last_price |floatformat }}$</td>
-                                {% percentage_change stock.price stock.live.last_price as percetage %}
-                                <td>
-                                    {% if percetage < 0 %}
-                                        <span class="badge rounded-pill bg-danger">{{ percetage }}%</span>
-                                    {% else %}
-                                        <span class="badge rounded-pill bg-success">{{ percetage }}%</span>
-                                    {% endif %}
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Stock Ticker</th>
+                                <th scope="col">Buy Price</th>
+                                <th scope="col">Buy Date</th>
+                                <th scope="col">Current Price</th>
+                                <th scope="col">Change</th>
+
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {% for stock in item.obj.portfolio.open_stocks %}
+                                <tr>
+                                    <th scope="row">{{ stock.id }}</th>
+                                    <td>
+                                        {{ stock.stock_ticker }}
+                                        <a href="https://finance.yahoo.com/quote/{{ stock.stock_ticker }}/"
+                                           target="_blank">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                 fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd"
+                                                      d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                                                <circle cx="8" cy="4.5" r="1"/>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                    <td>{{ stock.price |floatformat }}$</td>
+                                    <td>{{ stock.purchase_at }}</td>
+                                    <td>{{ stock.live.last_price |floatformat }}$</td>
+                                    {% percentage_change stock.price stock.live.last_price as percetage %}
+                                    <td>
+                                        {% if percetage < 0 %}
+                                            <span class="badge rounded-pill bg-danger">{{ percetage }}%</span>
+                                        {% else %}
+                                            <span class="badge rounded-pill bg-success">{{ percetage }}%</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             {% endfor %}
         </div>
@@ -144,41 +149,44 @@
                     <p>
                         {{ item.obj.description }}
                     </p>
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th scope="col">Stock Ticker</th>
-                            <th scope="col">Current Price</th>
-                            <th scope="col">Last Prices</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for stock in item.thread.stock_to_watch %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
                             <tr>
-                                <td>
-                                    {{ stock.stock_name }}
-                                    <a href="https://finance.yahoo.com/quote/{{ stock.stock_name }}" target="_blank">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                             fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd"
-                                                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                            <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
-                                            <circle cx="8" cy="4.5" r="1"/>
-                                        </svg>
-                                    </a>
-                                </td>
-                                <td>{{ stock.last_price | floatformat }}</td>
-                                <td>
-                                    {% get_key item.thread.stock_watcher stock.stock_name as watch_prices %}
-                                    {% for h_price in watch_prices.history_prices %}
-                                        {{ h_price | floatformat }}
-                                    {% endfor %}
-                                </td>
-                                <td></td>
+                                <th scope="col">Stock Ticker</th>
+                                <th scope="col">Current Price</th>
+                                <th scope="col">Last Prices</th>
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {% for stock in item.thread.stock_to_watch %}
+                                <tr>
+                                    <td>
+                                        {{ stock.stock_name }}
+                                        <a href="https://finance.yahoo.com/quote/{{ stock.stock_name }}"
+                                           target="_blank">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                 fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd"
+                                                      d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                                                <circle cx="8" cy="4.5" r="1"/>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                    <td>{{ stock.last_price | floatformat }}$</td>
+                                    <td>
+                                        {% get_key item.thread.stock_watcher stock.stock_name as watch_prices %}
+                                        {% for h_price in watch_prices.history_prices %}
+                                            <span class="badge bg-secondary">{{ h_price | floatformat }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             {% endfor %}
         </div>
@@ -201,52 +209,56 @@
                     <p>
                         {{ item.obj.description }}
                     </p>
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Stock Ticker</th>
-                            <th scope="col">Buy Price</th>
-                            <th scope="col">Buy Date</th>
-                            <th scope="col">Sold Price</th>
-                            <th scope="col">Sold Date</th>
-                            <th scope="col">Change</th>
-
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for stock in item.obj.portfolio.close_stocks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
                             <tr>
-                                <th scope="row">{{ stock.id }}</th>
-                                <td>
-                                    {{ stock.stock_ticker }}
-                                    <a href="https://finance.yahoo.com/quote/{{ stock.stock_ticker }}/" target="_blank">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                             fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd"
-                                                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                            <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
-                                            <circle cx="8" cy="4.5" r="1"/>
-                                        </svg>
-                                    </a>
-                                </td>
-                                <td>{{ stock.price |floatformat }}</td>
-                                <td>{{ stock.purchase_at }}</td>
-                                <td>{{ stock.sold_price |floatformat }}$</td>
-                                <td>{{ stock.sold_at }}</td>
-                                {% with stock.percentage as percetage %}
-                                    <td>
-                                        {% if percetage < 0 %}
-                                            <span class="badge rounded-pill bg-danger">{{ percetage }}%</span>
-                                        {% else %}
-                                            <span class="badge rounded-pill bg-success">{{ percetage }}%</span>
-                                        {% endif %}
-                                    </td>
-                                {% endwith %}
+                                <th scope="col">#</th>
+                                <th scope="col">Stock Ticker</th>
+                                <th scope="col">Buy Price</th>
+                                <th scope="col">Buy Date</th>
+                                <th scope="col">Sold Price</th>
+                                <th scope="col">Sold Date</th>
+                                <th scope="col">Change</th>
+
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {% for stock in item.obj.portfolio.close_stocks %}
+                                <tr>
+                                    <th scope="row">{{ stock.id }}</th>
+                                    <td>
+                                        {{ stock.stock_ticker }}
+                                        <a href="https://finance.yahoo.com/quote/{{ stock.stock_ticker }}/"
+                                           target="_blank">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                 fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd"
+                                                      d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                                                <circle cx="8" cy="4.5" r="1"/>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                    <td>{{ stock.price |floatformat }}$</td>
+                                    <td>{{ stock.purchase_at }}</td>
+                                    <td>{{ stock.sold_price |floatformat }}$</td>
+                                    <td>{{ stock.sold_at }}</td>
+                                    {% with stock.percentage as percetage %}
+                                        <td>
+
+                                            {% if percetage < 0 %}
+                                                <span class="badge rounded-pill bg-danger">{{ stock.profit |floatformat }} ({{ percetage }}%)</span>
+                                            {% else %}
+                                                <span class="badge rounded-pill bg-success">{{ stock.profit |floatformat }} ({{ percetage }}%)</span>
+                                            {% endif %}
+                                        </td>
+                                    {% endwith %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             {% endfor %}
         </div>
