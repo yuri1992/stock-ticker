@@ -31,7 +31,7 @@ class AlgorithmBase:
 
         # We are checking for 3 times in a row increase in price between the intervals
         self.number_of_increase_in_row = 4
-        self.minutes_between_increase_in_row = 5
+        self.minutes_between_increase_in_row = 15
 
         self.last_time = None
         self.last_time_find_criteria = None
