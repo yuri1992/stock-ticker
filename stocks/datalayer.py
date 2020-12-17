@@ -22,7 +22,7 @@ class YahooFinanceCache:
 YahooFinanceCache = YahooFinanceCache()
 
 cache = TTLCache(maxsize=1024, ttl=5)
-long_cache = TTLCache(maxsize=1024, ttl=60 * 60 * 24)
+long_cache = TTLCache(maxsize=1024, ttl=60 * 60 * 12)
 lock = RLock()
 
 
