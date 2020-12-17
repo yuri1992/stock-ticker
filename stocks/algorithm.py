@@ -114,7 +114,6 @@ class AlgorithmBase:
             return
 
         for stock in self.get_open_stocks():
-            already_purchased_stocks.add(stock.live)
             change = get_change(stock.live.price, stock.price)
             if change >= self.sell_threshold and stock.price < stock.live.price:
                 logger.info("We are bought the stock %s in price of %s sell in price of %s",
@@ -141,6 +140,10 @@ class AlgorithmBase:
                     self.sell_stock(stock.live)
                 elif stock.price > stock.live.price:
                     self.sell_stock(stock.live)
+                else:
+                    already_purchased_stocks.add(stock.live)
+            else:
+                already_purchased_stocks.add(stock.live)
 
     def find_stocks_in_criteria(self, already_purchased_stocks):
         if self.last_time_find_criteria and now() - self.last_time_find_criteria < timedelta(minutes=self.interval):
