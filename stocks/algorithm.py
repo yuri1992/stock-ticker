@@ -89,7 +89,7 @@ class AlgorithmBase:
         }
 
     def is_trading_day(self):
-        return isbday(now())
+        return now().weekday() in [0, 1, 2, 3, 4]
 
     def is_trade_open(self):
         d = now()
