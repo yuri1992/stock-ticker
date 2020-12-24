@@ -40,10 +40,10 @@ class Portfolio(models.Model):
         return total / count
 
     def open_stocks(self):
-        return self.stock_set.filter(sold_at__isnull=True)
+        return self.stock_set.filter(sold_at__isnull=True).order_by('purchase_at')
 
     def close_stocks(self):
-        return self.stock_set.filter(sold_at__isnull=False)
+        return self.stock_set.filter(sold_at__isnull=False).order_by('purchase_at')
 
     @property
     def stock_open_len(self):
