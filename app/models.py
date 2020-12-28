@@ -44,12 +44,12 @@ class Portfolio(models.Model):
 
     def open_stocks(self):
         return self.stock_set.filter(sold_at__isnull=True) \
-            .filter(purchase_at=timezone.now() - timedelta(days=4)) \
+            .filter(purchase_at__gte=timezone.now() - timedelta(days=4)) \
             .order_by('-purchase_at')
 
     def close_stocks(self):
         return self.stock_set.filter(sold_at__isnull=False) \
-            .filter(purchase_at=timezone.now() - timedelta(days=4)) \
+            .filter(purchase_at__gte=timezone.now() - timedelta(days=4)) \
             .order_by('-purchase_at')
 
     @property
