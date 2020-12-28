@@ -51,7 +51,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
                 Checking if the stock has a decrese momentom in the last month.
                 checking if the stock has decrease more than %self.percentage_decrease
             """
-            if price_change < 0 and percentage_change > self.percentage_decrease:
+            if price_change > 0 and percentage_change > self.percentage_decrease:
                 logger.info(
                     "Stock %s entered to the watch list, Price at before corona peak ago %s, Price now %s change: %s",
                     stock.name,
