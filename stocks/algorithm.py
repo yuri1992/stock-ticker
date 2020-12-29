@@ -18,6 +18,8 @@ logger = logging.getLogger(__name__)
 
 class AlgorithmBase:
     STOCK_PRICE_BUCKET = 2500
+    CONTINUE_HOLDING = "CONTINUE"
+    SELL = "SELL"
 
     def __init__(self, strategy_name=None, sell_threshold=2, interval=4, *args, **kwargs):
         super(AlgorithmBase, self).__init__()
@@ -109,29 +111,45 @@ class AlgorithmBase:
         market_close = now().replace(hour=21, minute=0, second=0, microsecond=0)
         return market_close - now()
 
+    def get_momentom(self, stock: Stock):
+        live_data = stock.live
+        last_15_minutes = live_data.get_price_at("15m", interval="1m")
+
+        bought_price = stock.price
+        price_now = last_15_minutes.Close[-1]
+        momentom_diff = (last_15_minutes.Close - last_15_minutes.Open).sum()
+
+        number_of_increase = len([x for x in (last_15_minutes.Close - last_15_minutes.Open).gt(0) if x])
+
+        revenue = price_now - bought_price
+
+        if momentom_diff > 0:
+            if revenue > 0:
+                return self.CONTINUE_HOLDING
+            if revenue <= 0 and get_change(price_now,
+                                           bought_price) <= self.stop_sell_threshold and number_of_increase >= 7:
+                return self.CONTINUE_HOLDING
+
+            return self.SELL
+        else:
+            if revenue > 0:
+                return self.SELL
+
+            if get_change(price_now, bought_price) <= self.stop_sell_threshold:
+                return self.CONTINUE_HOLDING
+
+            return self.CONTINUE_HOLDING
+
+        return self.CONTINUE_HOLDING
+
     def watch_stock_to_sell(self, already_purchased_stocks):
         if not self.is_trade_open():
             return
 
         for stock in self.get_open_stocks():
-            change = get_change(stock.live.price, stock.price)
-            if change >= self.sell_threshold and stock.price < stock.live.price:
-                logger.info("We are bought the stock %s in price of %s sell in price of %s",
-                            stock.stock_ticker,
-                            stock.price,
-                            stock.live.price)
-                self.sell_stock(stock.live)
-            elif change >= self.stop_sell_threshold and stock.price > stock.live.price:
-                logger.info("Selling in lose, We are bought the stock %s in price of %s sell in price of %s",
-                            stock.stock_ticker,
-                            stock.price,
-                            stock.live.price)
-                self.sell_stock(stock.live)
-            elif self.is_trade_open() and self.time_to_trade_close() < timedelta(hours=1):
-                """
-                    We want to sell before day close,
-                    We will sell stock we have a positve change even if it's not in the threshold
-                """
+
+            if self.is_trade_open() and self.time_to_trade_close() < timedelta(hours=1):
+                change = get_change(stock.live.price, stock.price)
                 if change >= (self.sell_threshold * SELL_BEFORE_CLOSE_FACTOR) and stock.price < stock.live.price:
                     logger.info("Sell before close, We are bought the stock %s in price of %s sell in price of %s",
                                 stock.stock_ticker,
@@ -140,15 +158,52 @@ class AlgorithmBase:
                     self.sell_stock(stock.live)
                 elif stock.price > stock.live.price:
                     self.sell_stock(stock.live)
-                else:
-                    already_purchased_stocks.add(stock.live)
-            else:
-                already_purchased_stocks.add(stock.live)
+
+            if self.get_momentom(stock) == self.SELL:
+                self.sell_stock(stock.live)
+
+            if self.get_momentom(stock) == self.CONTINUE_HOLDING:
+                pass
+
+            already_purchased_stocks.add(stock.live)
+
+            # change = get_change(stock.live.price, stock.price)
+            # if change >= self.sell_threshold and stock.price < stock.live.price:
+            #     logger.info("We are bought the stock %s in price of %s sell in price of %s",
+            #                 stock.stock_ticker,
+            #                 stock.price,
+            #                 stock.live.price)
+            #     self.sell_stock(stock.live)
+            # elif change >= self.stop_sell_threshold and stock.price > stock.live.price:
+            #     logger.info("Selling in lose, We are bought the stock %s in price of %s sell in price of %s",
+            #                 stock.stock_ticker,
+            #                 stock.price,
+            #                 stock.live.price)
+            #     self.sell_stock(stock.live)
+            # elif self.is_trade_open() and self.time_to_trade_close() < timedelta(hours=1):
+            #     """
+            #         We want to sell before day close,
+            #         We will sell stock we have a positve change even if it's not in the threshold
+            #     """
+            #     if change >= (self.sell_threshold * SELL_BEFORE_CLOSE_FACTOR) and stock.price < stock.live.price:
+            #         logger.info("Sell before close, We are bought the stock %s in price of %s sell in price of %s",
+            #                     stock.stock_ticker,
+            #                     stock.price,
+            #                     stock.live.price)
+            #         self.sell_stock(stock.live)
+            #     elif stock.price > stock.live.price:
+            #         self.sell_stock(stock.live)
+            #     else:
+            #         already_purchased_stocks.add(stock.live)
+            # else:
+            #     already_purchased_stocks.add(stock.live)
 
     def find_stocks_in_criteria(self, already_purchased_stocks):
         if self.last_time_find_criteria and now() - self.last_time_find_criteria < timedelta(minutes=self.interval):
+            #logger.info("%s skipped from finding criteria", self.algo.name)
             return
 
+        logger.info("%s started to find criteria stocks", self.algo.name)
         if not already_purchased_stocks:
             already_purchased_stocks = set()
 

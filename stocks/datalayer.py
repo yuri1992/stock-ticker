@@ -33,6 +33,7 @@ class LiveStock:
         if yfstock is None:
             self.data = yf.Ticker(stock_name)
 
+
     def __hash__(self):
         return hash(self.stock_name)
 
@@ -69,8 +70,8 @@ class LiveStock:
         return stock
 
     @cached(long_cache)
-    def get_price_at(self, period=None, start=None, end=None, auto_adjust=False):
-        return self.data.history(period=period, start=start, end=end, auto_adjust=False)
+    def get_price_at(self, period=None, start=None, end=None, interval="1d", auto_adjust=False):
+        return self.data.history(period=period, interval=interval, start=start, end=end, auto_adjust=False)
 
     def get_close_price(self, period="1d"):
         return self.data.history(period=period, interval="1m", auto_adjust=False).Close[-1]
