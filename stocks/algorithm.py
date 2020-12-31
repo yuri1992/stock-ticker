@@ -115,7 +115,7 @@ class AlgorithmBase:
         live_data = stock.live
         last_15_minutes = live_data.get_price_at("15m", interval="1m")
 
-        bought_price = stock.price
+        bought_price = float(stock.price)
         price_now = last_15_minutes.Close[-1]
         momentom_diff = (last_15_minutes.Close - last_15_minutes.Open).sum()
 
@@ -225,13 +225,14 @@ class AlgorithmBase:
         if not self.stock_to_watch:
             return
 
-        if self.last_time and now() - self.last_time < timedelta(minutes=self.minutes_between_increase_in_row):
-            return
-
         self.last_time = now()
         for stock in list(self.stock_to_watch):
             if stock.name not in self.stock_watcher:
                 self.clear_stock_history(stock)
+
+            last_check_date = self.stock_watcher[stock.name].get("last_date")
+            if last_check_date and now() - last_check_date < timedelta(minutes=self.minutes_between_increase_in_row):
+                return
 
             # Check when to buy the stock.
             # Get price form yahoo
@@ -239,7 +240,7 @@ class AlgorithmBase:
             current_price = stock.price
             logger.info("Stock %s price now is %s, last price was %s", stock.name, current_price, last_price)
 
-            if last_price:
+            if last_price and current_price:
                 if current_price > last_price:
                     self.stock_watcher[stock.name].get('history').append(True)
                 elif current_price == last_price:
@@ -250,6 +251,7 @@ class AlgorithmBase:
 
             # Set last price
             self.stock_watcher[stock.name]['last_price'] = current_price
+            self.stock_watcher[stock.name]['last_date'] = now()
             self.stock_watcher[stock.name]['history_prices'].append(current_price)
 
             if all(list(self.stock_watcher[stock.name]['history'])) and len(

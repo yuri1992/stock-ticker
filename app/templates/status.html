@@ -155,6 +155,7 @@
                             <tr>
                                 <th scope="col">Stock Ticker</th>
                                 <th scope="col">Current Price</th>
+                                <th scope="col">Last Check</th>
                                 <th scope="col">Last Prices</th>
                             </tr>
                             </thead>
@@ -175,6 +176,10 @@
                                         </a>
                                     </td>
                                     <td>{{ stock.last_price | floatformat }}$</td>
+                                    <td>
+                                        {% get_key item.thread.stock_watcher stock.stock_name as stock_time %}
+                                        {{ stock_time.last_date }}
+                                    </td>
                                     <td>
                                         {% get_key item.thread.stock_watcher stock.stock_name as watch_prices %}
                                         {% for h_price in watch_prices.history_prices %}
