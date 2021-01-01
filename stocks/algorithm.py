@@ -122,8 +122,11 @@ class AlgorithmBase:
         number_of_increase = len([x for x in (last_15_minutes.Close - last_15_minutes.Open).gt(0) if x])
 
         revenue = price_now - bought_price
+        if revenue == 0:
+            return self.CONTINUE_HOLDING
 
         if momentom_diff > 0:
+
             if revenue > 0:
                 return self.CONTINUE_HOLDING
             if revenue <= 0 and get_change(price_now,
@@ -200,7 +203,7 @@ class AlgorithmBase:
 
     def find_stocks_in_criteria(self, already_purchased_stocks):
         if self.last_time_find_criteria and now() - self.last_time_find_criteria < timedelta(minutes=self.interval):
-            #logger.info("%s skipped from finding criteria", self.algo.name)
+            # logger.info("%s skipped from finding criteria", self.algo.name)
             return
 
         logger.info("%s started to find criteria stocks", self.algo.name)
