@@ -150,28 +150,29 @@ class AlgorithmBase:
             return
 
         for stock in self.get_open_stocks():
+            try:
+                if self.is_trade_open() and self.time_to_trade_close() < timedelta(hours=1):
+                    if now() - stock.purchase_at > timedelta(minutes=5):
+                        change = get_change(stock.live.price, stock.price)
+                        if change >= (self.sell_threshold * SELL_BEFORE_CLOSE_FACTOR) and stock.price < stock.live.price:
+                            logger.info("Sell before close, We are bought the stock %s in price of %s sell in price of %s",
+                                        stock.stock_ticker,
+                                        stock.price,
+                                        stock.live.price)
+                            self.sell_stock(stock.live)
+                        elif stock.price > stock.live.price:
+                            self.sell_stock(stock.live)
 
-            if self.is_trade_open() and self.time_to_trade_close() < timedelta(hours=1):
-                if now() - stock.purchase_at > timedelta(minutes=5):
-                    change = get_change(stock.live.price, stock.price)
-                    if change >= (self.sell_threshold * SELL_BEFORE_CLOSE_FACTOR) and stock.price < stock.live.price:
-                        logger.info("Sell before close, We are bought the stock %s in price of %s sell in price of %s",
-                                    stock.stock_ticker,
-                                    stock.price,
-                                    stock.live.price)
+                if now() - stock.purchase_at > timedelta(minutes=15):
+                    if self.get_momentom(stock) == self.SELL:
                         self.sell_stock(stock.live)
-                    elif stock.price > stock.live.price:
-                        self.sell_stock(stock.live)
 
-            if now() - stock.purchase_at > timedelta(minutes=15):
-                if self.get_momentom(stock) == self.SELL:
-                    self.sell_stock(stock.live)
+                    if self.get_momentom(stock) == self.CONTINUE_HOLDING:
+                        logger.info("%s Momentom is positive, continue holding.", stock.name)
 
-                if self.get_momentom(stock) == self.CONTINUE_HOLDING:
-                    logger.info("Momentom is positive, continue holding.")
-
-            already_purchased_stocks.add(stock.live)
-
+                already_purchased_stocks.add(stock.live)
+            except:
+                logger.error("Error checking stock %s for selling", stock.stock_ticker)
             # change = get_change(stock.live.price, stock.price)
             # if change >= self.sell_threshold and stock.price < stock.live.price:
             #     logger.info("We are bought the stock %s in price of %s sell in price of %s",

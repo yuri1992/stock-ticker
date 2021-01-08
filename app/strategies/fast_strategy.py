@@ -56,7 +56,7 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
                     "Stock %s entered to the watch,"
                     "Price week ago (5d) %s, "
                     "Price now %s "
-                    "change: %s (%s)",
+                    "change: %s$ (%s %)",
                     stock.name,
                     hist,
                     current_price,
@@ -65,4 +65,4 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
 
                 self.stock_to_watch.add(stock)
         except Exception as e:
-            logger.warn("Error getting data about %s: %s", stock.name, e)
+            logger.warn("Error getting data about %s: %s", stock.stock_ticker, e)
