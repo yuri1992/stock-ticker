@@ -53,11 +53,15 @@ class MyStrategy(AlgorithmBase, BackgroundRunner):
             """
             if price_change > 0 and percentage_change > self.percentage_decrease:
                 logger.info(
-                    "Stock %s entered to the watch list, Price at before corona peak ago %s, Price now %s change: %s",
+                    "Stock %s entered to the watch,"
+                    "Price week ago (5d) %s, "
+                    "Price now %s "
+                    "change: %s (%s)",
                     stock.name,
                     hist,
                     current_price,
-                    percentage_change)
+                    round(price_change),
+                    round(percentage_change))
 
                 self.stock_to_watch.add(stock)
         except Exception as e:

@@ -21,7 +21,7 @@ class AlgorithmBase:
     CONTINUE_HOLDING = "CONTINUE"
     SELL = "SELL"
 
-    def __init__(self, strategy_name=None, sell_threshold=2, interval=4, *args, **kwargs):
+    def __init__(self, strategy_name=None, sell_threshold=2, interval=60, *args, **kwargs):
         super(AlgorithmBase, self).__init__()
         self.algo = Strategy.objects.get(name=strategy_name or self.__class__.__name__)
         self.iteration = 0
@@ -152,21 +152,23 @@ class AlgorithmBase:
         for stock in self.get_open_stocks():
 
             if self.is_trade_open() and self.time_to_trade_close() < timedelta(hours=1):
-                change = get_change(stock.live.price, stock.price)
-                if change >= (self.sell_threshold * SELL_BEFORE_CLOSE_FACTOR) and stock.price < stock.live.price:
-                    logger.info("Sell before close, We are bought the stock %s in price of %s sell in price of %s",
-                                stock.stock_ticker,
-                                stock.price,
-                                stock.live.price)
-                    self.sell_stock(stock.live)
-                elif stock.price > stock.live.price:
+                if now() - stock.purchase_at > timedelta(minutes=5):
+                    change = get_change(stock.live.price, stock.price)
+                    if change >= (self.sell_threshold * SELL_BEFORE_CLOSE_FACTOR) and stock.price < stock.live.price:
+                        logger.info("Sell before close, We are bought the stock %s in price of %s sell in price of %s",
+                                    stock.stock_ticker,
+                                    stock.price,
+                                    stock.live.price)
+                        self.sell_stock(stock.live)
+                    elif stock.price > stock.live.price:
+                        self.sell_stock(stock.live)
+
+            if now() - stock.purchase_at > timedelta(minutes=15):
+                if self.get_momentom(stock) == self.SELL:
                     self.sell_stock(stock.live)
 
-            if self.get_momentom(stock) == self.SELL:
-                self.sell_stock(stock.live)
-
-            if self.get_momentom(stock) == self.CONTINUE_HOLDING:
-                pass
+                if self.get_momentom(stock) == self.CONTINUE_HOLDING:
+                    logger.info("Momentom is positive, continue holding.")
 
             already_purchased_stocks.add(stock.live)
 

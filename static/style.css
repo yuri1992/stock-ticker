@@ -11,6 +11,10 @@
     border-radius: .25rem;
 }
 
+.pull-right {
+    float: right;
+}
+
 .bd-callout-danger {
     border-left-color: #d9534f;
 }
