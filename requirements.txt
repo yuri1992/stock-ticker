@@ -15,7 +15,7 @@ importlib-metadata==3.1.1
 iniconfig==1.1.1
 jsonfield==3.1.0
 korean-lunar-calendar==0.2.1
-lxml==4.6.2
+lxml==4.6.3
 multitasking==0.0.9
 mysqlclient==2.0.2
 numpy==1.19.4
